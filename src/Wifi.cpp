@@ -128,6 +128,7 @@ esp_err_t Wifi::handler(void*ctx,system_event_t*event)
     case SYSTEM_EVENT_STA_DISCONNECTED:
     ESP_LOGI("wifi", "Wi-Fi Reason: (%d)", event->event_info.disconnected.reason);
     ESP_LOGI("wifi","disconnected ");
+    xEventGroupClearBits(wifi_event_group,CONNECTED_BIT);
     esp_wifi_connect();
     break;
 

@@ -7,6 +7,7 @@
 #include "lwip/sys.h"
 #include "lwip/netif.h"
 #include "esp_event_loop.h"
+#include "mqtt.h"
 
 
  extern "C" {
@@ -50,6 +51,7 @@ void Switch(void* arg)
 }
 
 
+
 int app_main()
 {
    
@@ -68,6 +70,12 @@ int app_main()
     io.init(2,IO::INPUT);
     io.init(4,IO::OUTPUT);
     io.setIntr(2,ISR);
+
+    xEventGroupWaitBits(wifi.wifi_event_group,wifi.CONNECTED_BIT,false,true,portMAX_DELAY);
+
+    //mqtt.start();
+    MQTT mqtt("mqtt://localhost");
+    ESP_ERROR_CHECK(mqtt.start());
 
     xTaskCreate(Switch,"Switch",2048,NULL,10,NULL);
   
