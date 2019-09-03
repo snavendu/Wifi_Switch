@@ -10,10 +10,10 @@
 #include "esp_event_loop.h"
 #include "string.h"
 #include "esp_log.h"
+#include "gpio.h"
 
 
-
-class MQTT{
+class MQTT {
 
 public:
     MQTT(const char *);
@@ -22,14 +22,8 @@ public:
     esp_err_t start();
     static esp_err_t handler(esp_mqtt_event_handle_t );
     esp_mqtt_client_handle_t  client;
-    
-
+    static SemaphoreHandle_t xSemaphore ;
 private:
-
-
-   
-
 };
-
 
 #endif

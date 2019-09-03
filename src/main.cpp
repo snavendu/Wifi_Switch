@@ -10,6 +10,8 @@
 #include "mqtt.h"
 
 
+
+
  extern "C" {
  int app_main(void);
  }
@@ -18,6 +20,7 @@
 
 Wifi wifi;
 IO io;
+MQTT mqtt("mqtt://localhost");
 
 void ISR(void*)
 {
@@ -28,10 +31,11 @@ void Switch(void* arg)
 {
   bool status = 0;
   int count = 0;
-  xEventGroupWaitBits(wifi.wifi_event_group,wifi.CONNECTED_BIT,false,true,portMAX_DELAY);
+  //wait for wifi to get connected 
+  
   while(1)
   {
-    if(xSemaphoreTake(io.xSemaphore,portMAX_DELAY) == pdTRUE)
+    if(xSemaphoreTake(mqtt.xSemaphore,portMAX_DELAY) == pdTRUE)
     {
       if(status)
       {
@@ -61,7 +65,7 @@ int app_main()
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
-    io.xSemaphore = xSemaphoreCreateBinary();
+    
     esp_log_level_set("led", ESP_LOG_INFO); 
     
     
@@ -70,13 +74,11 @@ int app_main()
     io.init(2,IO::INPUT);
     io.init(4,IO::OUTPUT);
     io.setIntr(2,ISR);
-
-    xEventGroupWaitBits(wifi.wifi_event_group,wifi.CONNECTED_BIT,false,true,portMAX_DELAY);
-
-    //mqtt.start();
-    MQTT mqtt("mqtt://localhost");
+    
+    wifi.wait_for_connect();
+  
     ESP_ERROR_CHECK(mqtt.start());
-
+    
     xTaskCreate(Switch,"Switch",2048,NULL,10,NULL);
   
     while(1)

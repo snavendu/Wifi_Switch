@@ -23,6 +23,11 @@ class Wifi{
     public:
     static EventGroupHandle_t wifi_event_group;
     static const int CONNECTED_BIT = BIT0;
+    // enum protocol{
+    //     MQTT,
+    //     HTTP,
+    //     mDNS
+    // };
    
     Wifi() ;
     void init(wifi_mode_t);
@@ -31,6 +36,8 @@ class Wifi{
     esp_err_t connect();
     esp_err_t stop();
     esp_err_t reinit();
+    void wait_for_connect();
+    
     //we will config ,set the mode , scan and after that we will connect
     private:
 

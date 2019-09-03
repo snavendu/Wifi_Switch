@@ -16,7 +16,7 @@ public:
         OUTPUT
     }mode;
      //basic or common configuration
-    SemaphoreHandle_t xSemaphore ;
+    SemaphoreHandle_t xSemaphore= xSemaphoreCreateBinary();;
     
     esp_err_t init( uint8_t,mode);
     esp_err_t setMode(uint8_t,mode );

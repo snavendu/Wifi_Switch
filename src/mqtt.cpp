@@ -1,6 +1,5 @@
 #include "mqtt.h"
 
-
 MQTT::MQTT(const char * url)
 {
     esp_mqtt_client_config_t cfg;
@@ -47,21 +46,33 @@ void MQTT::publish(const char * topic, const char* mess)
 
 }
 
+bool on ;
+
 
 esp_err_t MQTT::handler(esp_mqtt_event_handle_t event)
 {
    esp_mqtt_client_handle_t client = event->client;
+   
    switch(event->event_id)
    {
        case MQTT_EVENT_CONNECTED:
-       ESP_LOGI("MQTT","connected");
-       esp_mqtt_client_subscribe(client,"0",1);
-       esp_mqtt_client_publish(client,"0","hi from esp 32",15,2,0);
-       break;
+        ESP_LOGI("MQTT","connected");
+        esp_mqtt_client_subscribe(client, "0", 1);
+        esp_mqtt_client_publish(client, "0", "hi from esp 32", 15, 2, 0);
+        gpio_set_direction(GPIO_NUM_2, GPIO_MODE_OUTPUT);
+        break;
        case MQTT_EVENT_DATA:
-       ESP_LOGI("mqtt","length : %d , topic %s",event->topic_len,event->topic);
-       ESP_LOGI("mqtt","length : %d , data %s",event->data_len,event->data);
-       default:
+        ESP_LOGI("mqtt","length : %d , topic %s",event->topic_len,event->topic);
+        ESP_LOGI("mqtt","length : %d , data %s",event->data_len,event->data);
+        on = !on;
+        //ESP_LOGI("mqtt", "SEtting led");
+        xSemaphoreGive(xSemaphore);
+        
+        gpio_set_level(GPIO_NUM_2, on ? 1 : 0);
+        break;
+        case MQTT_EVENT_ERROR:
+            ESP_LOGI("MQTT EVENT", "error: %s", event->data);
+        default:
        break;
    }
 
@@ -72,3 +83,6 @@ esp_err_t MQTT::start()
 {
    return  esp_mqtt_client_start(client);
 }
+
+
+SemaphoreHandle_t MQTT::xSemaphore=xSemaphoreCreateBinary();

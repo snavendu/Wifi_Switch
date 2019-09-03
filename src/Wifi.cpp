@@ -4,6 +4,7 @@ Wifi::Wifi( )
 {
     //
     tcpip_adapter_init();
+    //smartconfig init;
     
     //init(mode);
 }
@@ -139,4 +140,9 @@ esp_err_t Wifi::handler(void*ctx,system_event_t*event)
 
       return ESP_OK;
 
+}
+
+void Wifi::wait_for_connect()
+{
+    xEventGroupWaitBits(wifi_event_group,CONNECTED_BIT,false,true,portMAX_DELAY);
 }
